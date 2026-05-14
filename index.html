@@ -14,263 +14,7 @@
   <link href="https://fonts.googleapis.com/css?family=Lato:900,300" rel="stylesheet" type="text/css">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <style>
-    /* ─── Eval Results Section ─── */
-    .eval-section {
-      margin: 3rem 0 2rem;
-    }
-
-    .eval-section h2 {
-      margin-bottom: 0.75rem;
-    }
-
-    .eval-controls {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-bottom: 1.75rem;
-    }
-
-    .eval-controls label {
-      font-family: 'Lato', sans-serif;
-      font-weight: 900;
-      font-size: 0.9rem;
-      color: #444;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .eval-dropdown {
-      appearance: none;
-      -webkit-appearance: none;
-      background-color: #fff;
-      border: 2px solid #002676;
-      border-radius: 4px;
-      padding: 0.5rem 2.6rem 0.5rem 0.85rem;
-      font-family: 'Lato', sans-serif;
-      font-size: 0.9rem;
-      line-height: 1.2;
-      color: #002676;
-      font-weight: 900;
-      cursor: pointer;
-      outline: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23002676' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.75rem center;
-      transition: border-color 0.15s, box-shadow 0.15s;
-      min-width: 220px;
-    }
-
-    .eval-dropdown:hover,
-    .eval-dropdown:focus {
-      border-color: #FDB515;
-      box-shadow: 0 0 0 3px rgba(253, 181, 21, 0.25);
-    }
-
-    /* ─── Task Panel ─── */
-    .eval-panel {
-      display: none;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .eval-panel.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ─── Task Header ─── */
-    .eval-task-header {
-      border-left: 4px solid #002676;
-      padding: 0.6rem 0 0.6rem 1rem;
-      margin-bottom: 1.25rem;
-      background: #f5f7fb;
-    }
-
-    .eval-task-header h3 {
-      margin: 0 0 0.2rem;
-      font-family: 'Merriweather', serif;
-      font-size: 1.15rem;
-      color: #002676;
-    }
-
-    .eval-task-header p {
-      margin: 0;
-      font-size: 0.88rem;
-      color: #666;
-      font-family: 'Lato', sans-serif;
-    }
-
-    /* ─── Result Image ─── */
-    .eval-result-figure {
-      text-align: center;
-      margin: 0;
-    }
-
-    .eval-result-figure .result-img-wrap {
-      position: relative;
-      display: inline-block;
-      border: 1px solid #dde3ef;
-      border-radius: 6px;
-      overflow: hidden;
-      box-shadow: 0 2px 12px rgba(0,38,118,0.08);
-      max-width: 100%;
-    }
-
-    .eval-result-figure img,
-    .eval-result-figure .img-placeholder {
-      display: block;
-      max-width: 100%;
-      height: auto;
-    }
-
-    /* Placeholder when no real image is provided */
-    .img-placeholder {
-      width: 720px;
-      max-width: 100%;
-      height: 380px;
-      background: linear-gradient(135deg, #e8edf8 0%, #f0f3fb 50%, #e2e8f5 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.6rem;
-      color: #6a7fa8;
-      font-family: 'Lato', sans-serif;
-      font-size: 0.9rem;
-    }
-
-    .img-placeholder .ph-icon {
-      font-size: 2.5rem;
-      color: #b0bcda;
-    }
-
-    .img-placeholder .ph-label {
-      font-weight: 900;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      font-size: 0.78rem;
-      color: #8a9ec4;
-    }
-
-    .eval-result-figure figcaption {
-      margin-top: 0.65rem;
-      font-size: 0.87rem;
-      color: #666;
-      font-family: 'Lato', sans-serif;
-      font-style: italic;
-    }
-
-    /* ─── Metric Badges ─── */
-    .eval-metrics {
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      margin-bottom: 1.5rem;
-      margin-top: 0.25rem;
-    }
-
-    .metric-badge {
-      background: #fff;
-      border: 1.5px solid #d0d8ee;
-      border-radius: 20px;
-      padding: 0.3rem 0.85rem;
-      font-family: 'Lato', sans-serif;
-      font-size: 0.82rem;
-      color: #444;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .metric-badge .metric-val {
-      font-weight: 900;
-      color: #002676;
-    }
-
-    .metric-badge.best {
-      border-color: #FDB515;
-      background: #fffbf0;
-    }
-
-    .metric-badge.best .metric-val {
-      color: #b07800;
-    }
-
-    /* ─── Pagination dots ─── */
-    .eval-pagination {
-      display: flex;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-top: 1.5rem;
-    }
-
-    .eval-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #cdd5e8;
-      border: none;
-      padding: 0;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-    }
-
-    .eval-dot.active {
-      background: #002676;
-      transform: scale(1.3);
-    }
-
-    .eval-dot:hover {
-      background: #4a6bba;
-    }
-
-    /* ─── Responsive ─── */
-    @media (max-width: 600px) {
-      .eval-controls {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .eval-dropdown { min-width: 100%; }
-      .img-placeholder { height: 220px; }
-    }
-
-    /* ─── Override some pixyll defaults for the section ─── */
-    .eval-section p {
-      margin-bottom: 0.85em;
-    }
-
-    /* ─── Interactive plot iframe ─── */
-    .plot-frame-wrap {
-      position: relative;
-      width: 100%;
-      border: 1px solid #dde3ef;
-      border-radius: 6px;
-      overflow: hidden;
-      box-shadow: 0 2px 12px rgba(0,38,118,0.08);
-      background: #fff;
-    }
-
-    .plot-frame-wrap iframe {
-      display: block;
-      width: 100%;
-      height: 720px;
-      border: 0;
-    }
-
-    @media (max-width: 800px) {
-      .plot-frame-wrap iframe { height: 560px; }
-    }
-
-    @media (max-width: 500px) {
-      .plot-frame-wrap iframe { height: 460px; }
-    }
-  </style>
+  <link rel="stylesheet" href="assets/css/styles.css" type="text/css">
 </head>
 
 <body class="site">
@@ -338,14 +82,28 @@
               Hover, zoom, and toggle layers inside the embedded plot to explore.
             </p>
 
-            <!-- Dropdown control -->
+            <!-- Dropdown control. Each <option> carries the plot's
+                 file path and header text via data-* attributes so the
+                 dropdown is the single source of truth. -->
             <div class="eval-controls">
               <label for="plot-select">Scatter Plot:</label>
               <select id="plot-select" class="eval-dropdown" onchange="showPlot(this.value)">
-                <option value="fullft">Full finetuning</option>
-                <option value="lora">LoRA finetuning</option>
-                <option value="adam_pre">Full and LoRA finetuning from Adam pretraining</option>
-                <option value="muon_pre">Full and LoRA finetuning from Muon pretraining</option>
+                <option value="fullft"
+                        data-src="plots/per_tensor_scatter_fullft_l_inf_vs_rms.html"
+                        data-title="Full finetuning"
+                        data-subtitle="Per-tensor weight changes for full finetuning of the base model.">Full finetuning</option>
+                <option value="lora"
+                        data-src="plots/per_tensor_scatter_lora_l_inf_vs_rms.html"
+                        data-title="LoRA finetuning"
+                        data-subtitle="Per-tensor weight changes when using LoRA adapters during finetuning.">LoRA finetuning</option>
+                <option value="adam_pre"
+                        data-src="plots/per_tensor_scatter_adam_pre_l_inf_vs_rms.html"
+                        data-title="Full and LoRA finetuning from Adam pretraining"
+                        data-subtitle="Per-tensor weight changes when finetuning (full or LoRA) starting from an Adam-pretrained base model.">Full and LoRA finetuning from Adam pretraining</option>
+                <option value="muon_pre"
+                        data-src="plots/per_tensor_scatter_muon_pre_l_inf_vs_rms.html"
+                        data-title="Full and LoRA finetuning from Muon pretraining"
+                        data-subtitle="Per-tensor weight changes when finetuning (full or LoRA) starting from a Muon-pretrained base model.">Full and LoRA finetuning from Muon pretraining</option>
               </select>
             </div>
 
@@ -356,7 +114,7 @@
 
             <div class="plot-frame-wrap">
               <iframe id="plot-frame"
-                      src="per_tensor_scatter_fullft_l_inf_vs_rms.html"
+                      src="plots/per_tensor_scatter_fullft_l_inf_vs_rms.html"
                       title="Interactive per-tensor scatter plot"
                       loading="lazy"
                       allow="fullscreen"></iframe>
@@ -595,89 +353,7 @@
     <div class="measure"></div>
   </footer>
 
-  <!-- ── Interactive plot switching logic ── -->
-  <script>
-    const PLOTS = [
-      {
-        key: 'fullft',
-        src: 'per_tensor_scatter_fullft_l_inf_vs_rms.html',
-        title: 'Full finetuning',
-        subtitle: 'Per-tensor weight changes for full finetuning of the base model.'
-      },
-      {
-        key: 'lora',
-        src: 'per_tensor_scatter_lora_l_inf_vs_rms.html',
-        title: 'LoRA finetuning',
-        subtitle: 'Per-tensor weight changes when using LoRA adapters during finetuning.'
-      },
-      {
-        key: 'adam_pre',
-        src: 'per_tensor_scatter_adam_pre_l_inf_vs_rms.html',
-        title: 'Full and LoRA finetuning from Adam pretraining',
-        subtitle: 'Per-tensor weight changes when finetuning (full or LoRA) starting from an Adam-pretrained base model.'
-      },
-      {
-        key: 'muon_pre',
-        src: 'per_tensor_scatter_muon_pre_l_inf_vs_rms.html',
-        title: 'Full and LoRA finetuning from Muon pretraining',
-        subtitle: 'Per-tensor weight changes when finetuning (full or LoRA) starting from a Muon-pretrained base model.'
-      }
-    ];
-
-    function showPlot(key) {
-      const idx = PLOTS.findIndex(p => p.key === key);
-      if (idx === -1) return;
-      const plot  = PLOTS[idx];
-      const frame = document.getElementById('plot-frame');
-      if (frame.getAttribute('data-src') !== plot.src) {
-        frame.setAttribute('data-src', plot.src);
-        frame.src = plot.src;
-      }
-      document.getElementById('plot-title').textContent    = plot.title;
-      document.getElementById('plot-subtitle').textContent = plot.subtitle;
-      document.getElementById('plot-select').value         = key;
-      document.querySelectorAll('#plot-dots .eval-dot').forEach((dot, i) => {
-        dot.classList.toggle('active', i === idx);
-      });
-    }
-
-    function selectPlot(idx) {
-      if (idx < 0 || idx >= PLOTS.length) return;
-      showPlot(PLOTS[idx].key);
-    }
-
-    // ── Eval-task dropdown / dot logic (Evaluation Results section) ──
-    const TASKS = [
-      'task-pusht',
-      'task-ballnav',
-      'task-maze2d',
-      'task-robopush',
-      'task-pointmass'
-    ];
-
-    function showTask(taskId) {
-      const dots = document.querySelectorAll('#eval-dots .eval-dot');
-      TASKS.forEach((id, idx) => {
-        const panel = document.getElementById(id);
-        const active = (id === taskId);
-        if (panel) panel.classList.toggle('active', active);
-        if (dots[idx]) dots[idx].classList.toggle('active', active);
-      });
-      document.getElementById('eval-task-select').value = taskId;
-    }
-
-    function selectTask(idx) {
-      showTask(TASKS[idx]);
-    }
-
-    // Track currently-selected optimizers. These currently don't change the
-    // displayed task panel; wire them into showTask() if/when results need to
-    // depend on optimizer choice.
-    const evalState = { pretrainOpt: 'adam', finetuneOpt: 'adam' };
-
-    function setPretrainOpt(v) { evalState.pretrainOpt = v; }
-    function setFinetuneOpt(v) { evalState.finetuneOpt = v; }
-  </script>
+  <script src="assets/js/main.js"></script>
 
 </body>
 </html>
