@@ -48,9 +48,10 @@
       background-color: #fff;
       border: 2px solid #002676;
       border-radius: 4px;
-      padding: 0.45rem 2.6rem 0.45rem 0.85rem;
+      padding: 0.5rem 2.6rem 0.5rem 0.85rem;
       font-family: 'Lato', sans-serif;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
+      line-height: 1.2;
       color: #002676;
       font-weight: 900;
       cursor: pointer;
@@ -243,6 +244,32 @@
     .eval-section p {
       margin-bottom: 0.85em;
     }
+
+    /* ─── Interactive plot iframe ─── */
+    .plot-frame-wrap {
+      position: relative;
+      width: 100%;
+      border: 1px solid #dde3ef;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,38,118,0.08);
+      background: #fff;
+    }
+
+    .plot-frame-wrap iframe {
+      display: block;
+      width: 100%;
+      height: 720px;
+      border: 0;
+    }
+
+    @media (max-width: 800px) {
+      .plot-frame-wrap iframe { height: 560px; }
+    }
+
+    @media (max-width: 500px) {
+      .plot-frame-wrap iframe { height: 460px; }
+    }
   </style>
 </head>
 
@@ -299,701 +326,48 @@
           <hr>
 
           <!-- ══════════════════════════════════════════════
-               INTERACTIVE EVAL RESULTS SECTION
+               INTERACTIVE PER-TENSOR SCATTER PLOTS
           ══════════════════════════════════════════════ -->
           <div class="eval-section">
-            <h2 id="eval-results">Evaluation Results</h2>
+            <h2 id="interactive-plots">Per-Tensor Weight-Change Scatter Plots</h2>
 
             <p>
-              Select an evaluation task below to view GRASP's results compared to baseline planners.
-              Each task tests a different aspect of long-horizon planning under a learned world model.
+              Each interactive plot below visualizes per-tensor weight changes
+              \( \lVert \Delta W \rVert_\infty \) vs. \( \lVert \Delta W \rVert_{\text{RMS} \to \text{RMS}} \)
+              for a different optimizer / finetuning setting. Use the dropdown to switch between settings.
+              Hover, zoom, and toggle layers inside the embedded plot to explore.
             </p>
 
             <!-- Dropdown control -->
             <div class="eval-controls">
-              <label for="eval-task-select">Eval Task:</label>
-              <select id="eval-task-select" class="eval-dropdown" onchange="showTask(this.value)">
-                <option value="task-pusht">Push-T</option>
-                <option value="task-ballnav">Ball Navigation</option>
-                <option value="task-maze2d">Maze2D</option>
-                <option value="task-robopush">RoboPush</option>
-                <option value="task-pointmass">Point Mass</option>
+              <label for="plot-select">Scatter Plot:</label>
+              <select id="plot-select" class="eval-dropdown" onchange="showPlot(this.value)">
+                <option value="fullft">Full finetuning</option>
+                <option value="lora">LoRA finetuning</option>
+                <option value="adam_pre">Full and LoRA finetuning from Adam pretraining</option>
+                <option value="muon_pre">Full and LoRA finetuning from Muon pretraining</option>
               </select>
             </div>
 
-            <!-- ── Task 1: Push-T ── -->
-            <div id="task-pusht" class="eval-panel active">
-              <div class="eval-task-header">
-                <h3>Push-T</h3>
-                <p>Goal-conditioned planar pushing task. A disc must be pushed to align a T-shaped block with a target pose.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">43.4 %</span> success @ H=50</span>
-                <span class="metric-badge best"><span class="metric-val">15.2 s</span> median time @ H=50</span>
-                <span class="metric-badge"><span class="metric-val">4×</span> faster than CEM</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <!-- Replace src with actual result image path, e.g. src="results/pusht_results.png" -->
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">Push-T &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/pusht_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  Push-T success rate (%) and median time-to-success across planning horizons H=40–80.
-                  GRASP achieves the highest success rate at longer horizons while remaining the fastest.
-                </figcaption>
-              </figure>
+            <div class="eval-task-header">
+              <h3 id="plot-title">Full finetuning</h3>
+              <p id="plot-subtitle">Per-tensor weight changes for full finetuning of the base model.</p>
             </div>
 
-            <!-- ── Task 2: Ball Navigation ── -->
-            <div id="task-ballnav" class="eval-panel">
-              <div class="eval-task-header">
-                <h3>Ball Navigation</h3>
-                <p>A ball must navigate around obstacles to reach a goal position in a 2D arena.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">87.2 %</span> success rate</span>
-                <span class="metric-badge best"><span class="metric-val">3.1 s</span> median time</span>
-                <span class="metric-badge"><span class="metric-val">2×</span> faster than GD</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">Ball Navigation &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/ballnav_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  Ball Navigation success rate across varying planning horizons. GRASP leverages
-                  lifted-state exploration to navigate around obstacles that trip up serial planners.
-                </figcaption>
-              </figure>
-            </div>
-
-            <!-- ── Task 3: Maze2D ── -->
-            <div id="task-maze2d" class="eval-panel">
-              <div class="eval-task-header">
-                <h3>Maze2D</h3>
-                <p>A point agent must find a path through a 2D maze to a goal, requiring non-greedy long-range planning.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">74.0 %</span> success rate</span>
-                <span class="metric-badge best"><span class="metric-val">11.4 s</span> median time</span>
-                <span class="metric-badge"><span class="metric-val">LatCo 0 %</span> at H=70</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">Maze2D &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/maze2d_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  Maze2D: success rate vs. horizon. All baselines degrade sharply beyond H=60;
-                  GRASP's stop-gradient collocation maintains a viable success rate.
-                </figcaption>
-              </figure>
-            </div>
-
-            <!-- ── Task 4: RoboPush ── -->
-            <div id="task-robopush" class="eval-panel">
-              <div class="eval-task-header">
-                <h3>RoboPush</h3>
-                <p>A robot arm must push an object to a target configuration on a table-top surface.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">61.8 %</span> success rate</span>
-                <span class="metric-badge best"><span class="metric-val">22.7 s</span> median time</span>
-                <span class="metric-badge"><span class="metric-val">+18 pp</span> over GD</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">RoboPush &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/robopush_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  RoboPush results. The stop-gradient gradient-shaping is critical here because the
-                  high-dimensional visual state makes raw state-input gradients unreliable.
-                </figcaption>
-              </figure>
-            </div>
-
-            <!-- ── Task 5: Point Mass ── -->
-            <div id="task-pointmass" class="eval-panel">
-              <div class="eval-task-header">
-                <h3>Point Mass</h3>
-                <p>A canonical continuous-control benchmark: a point mass must reach a goal in a bounded 2D space.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">95.4 %</span> success rate</span>
-                <span class="metric-badge best"><span class="metric-val">1.8 s</span> median time</span>
-                <span class="metric-badge"><span class="metric-val">H=100</span> horizon tested</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">Point Mass &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/pointmass_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  Point Mass results at very long horizons (H up to 100). GRASP's parallel
-                  collocation yields near-constant wall-clock time as horizon increases.
-                </figcaption>
-              </figure>
+            <div class="plot-frame-wrap">
+              <iframe id="plot-frame"
+                      src="per_tensor_scatter_fullft_l_inf_vs_rms.html"
+                      title="Interactive per-tensor scatter plot"
+                      loading="lazy"
+                      allow="fullscreen"></iframe>
             </div>
 
             <!-- Pagination dots -->
-            <div class="eval-pagination" id="eval-dots">
-              <button class="eval-dot active" onclick="selectTask(0)" title="Push-T"></button>
-              <button class="eval-dot" onclick="selectTask(1)" title="Ball Navigation"></button>
-              <button class="eval-dot" onclick="selectTask(2)" title="Maze2D"></button>
-              <button class="eval-dot" onclick="selectTask(3)" title="RoboPush"></button>
-              <button class="eval-dot" onclick="selectTask(4)" title="Point Mass"></button>
-            </div>
-
-          </div><!-- /.eval-section -->
-
-           <!-- ══════════════════════════════════════════════
-               INTERACTIVE EVAL RESULTS SECTION
-          ══════════════════════════════════════════════ -->
-          <div class="eval-section">
-            <h2 id="eval-results">Evaluation Results</h2>
-
-            <p>
-              Select an evaluation task below to view GRASP's results compared to baseline planners.
-              Each task tests a different aspect of long-horizon planning under a learned world model.
-            </p>
-
-            <!-- Dropdown control -->
-            <div class="eval-controls">
-              <label for="eval-task-select">Eval Task:</label>
-              <select id="eval-task-select" class="eval-dropdown" onchange="showTask(this.value)">
-                <option value="task-pusht">Push-T</option>
-                <option value="task-ballnav">Ball Navigation</option>
-                <option value="task-maze2d">Maze2D</option>
-                <option value="task-robopush">RoboPush</option>
-                <option value="task-pointmass">Point Mass</option>
-              </select>
-            </div>
-
-            <!-- ── Task 1: Push-T ── -->
-            <div id="task-pusht" class="eval-panel active">
-              <div class="eval-task-header">
-                <h3>Push-T</h3>
-                <p>Goal-conditioned planar pushing task. A disc must be pushed to align a T-shaped block with a target pose.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">43.4 %</span> success @ H=50</span>
-                <span class="metric-badge best"><span class="metric-val">15.2 s</span> median time @ H=50</span>
-                <span class="metric-badge"><span class="metric-val">4×</span> faster than CEM</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <!-- Replace src with actual result image path, e.g. src="results/pusht_results.png" -->
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">Push-T &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/pusht_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  Push-T success rate (%) and median time-to-success across planning horizons H=40–80.
-                  GRASP achieves the highest success rate at longer horizons while remaining the fastest.
-                </figcaption>
-              </figure>
-            </div>
-
-            <!-- ── Task 2: Ball Navigation ── -->
-            <div id="task-ballnav" class="eval-panel">
-              <div class="eval-task-header">
-                <h3>Ball Navigation</h3>
-                <p>A ball must navigate around obstacles to reach a goal position in a 2D arena.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">87.2 %</span> success rate</span>
-                <span class="metric-badge best"><span class="metric-val">3.1 s</span> median time</span>
-                <span class="metric-badge"><span class="metric-val">2×</span> faster than GD</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">Ball Navigation &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/ballnav_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  Ball Navigation success rate across varying planning horizons. GRASP leverages
-                  lifted-state exploration to navigate around obstacles that trip up serial planners.
-                </figcaption>
-              </figure>
-            </div>
-
-            <!-- ── Task 3: Maze2D ── -->
-            <div id="task-maze2d" class="eval-panel">
-              <div class="eval-task-header">
-                <h3>Maze2D</h3>
-                <p>A point agent must find a path through a 2D maze to a goal, requiring non-greedy long-range planning.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">74.0 %</span> success rate</span>
-                <span class="metric-badge best"><span class="metric-val">11.4 s</span> median time</span>
-                <span class="metric-badge"><span class="metric-val">LatCo 0 %</span> at H=70</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">Maze2D &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/maze2d_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  Maze2D: success rate vs. horizon. All baselines degrade sharply beyond H=60;
-                  GRASP's stop-gradient collocation maintains a viable success rate.
-                </figcaption>
-              </figure>
-            </div>
-
-            <!-- ── Task 4: RoboPush ── -->
-            <div id="task-robopush" class="eval-panel">
-              <div class="eval-task-header">
-                <h3>RoboPush</h3>
-                <p>A robot arm must push an object to a target configuration on a table-top surface.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">61.8 %</span> success rate</span>
-                <span class="metric-badge best"><span class="metric-val">22.7 s</span> median time</span>
-                <span class="metric-badge"><span class="metric-val">+18 pp</span> over GD</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">RoboPush &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/robopush_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  RoboPush results. The stop-gradient gradient-shaping is critical here because the
-                  high-dimensional visual state makes raw state-input gradients unreliable.
-                </figcaption>
-              </figure>
-            </div>
-
-            <!-- ── Task 5: Point Mass ── -->
-            <div id="task-pointmass" class="eval-panel">
-              <div class="eval-task-header">
-                <h3>Point Mass</h3>
-                <p>A canonical continuous-control benchmark: a point mass must reach a goal in a bounded 2D space.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">95.4 %</span> success rate</span>
-                <span class="metric-badge best"><span class="metric-val">1.8 s</span> median time</span>
-                <span class="metric-badge"><span class="metric-val">H=100</span> horizon tested</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">Point Mass &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/pointmass_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  Point Mass results at very long horizons (H up to 100). GRASP's parallel
-                  collocation yields near-constant wall-clock time as horizon increases.
-                </figcaption>
-              </figure>
-            </div>
-
-            <!-- Pagination dots -->
-            <div class="eval-pagination" id="eval-dots">
-              <button class="eval-dot active" onclick="selectTask(0)" title="Push-T"></button>
-              <button class="eval-dot" onclick="selectTask(1)" title="Ball Navigation"></button>
-              <button class="eval-dot" onclick="selectTask(2)" title="Maze2D"></button>
-              <button class="eval-dot" onclick="selectTask(3)" title="RoboPush"></button>
-              <button class="eval-dot" onclick="selectTask(4)" title="Point Mass"></button>
-            </div>
-
-          </div><!-- /.eval-section -->
-
-           <!-- ══════════════════════════════════════════════
-               INTERACTIVE EVAL RESULTS SECTION
-          ══════════════════════════════════════════════ -->
-          <div class="eval-section">
-            <h2 id="eval-results">Evaluation Results</h2>
-
-            <p>
-              Select an evaluation task below to view GRASP's results compared to baseline planners.
-              Each task tests a different aspect of long-horizon planning under a learned world model.
-            </p>
-
-            <!-- Dropdown control -->
-            <div class="eval-controls">
-              <label for="eval-task-select">Eval Task:</label>
-              <select id="eval-task-select" class="eval-dropdown" onchange="showTask(this.value)">
-                <option value="task-pusht">Push-T</option>
-                <option value="task-ballnav">Ball Navigation</option>
-                <option value="task-maze2d">Maze2D</option>
-                <option value="task-robopush">RoboPush</option>
-                <option value="task-pointmass">Point Mass</option>
-              </select>
-            </div>
-
-            <!-- ── Task 1: Push-T ── -->
-            <div id="task-pusht" class="eval-panel active">
-              <div class="eval-task-header">
-                <h3>Push-T</h3>
-                <p>Goal-conditioned planar pushing task. A disc must be pushed to align a T-shaped block with a target pose.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">43.4 %</span> success @ H=50</span>
-                <span class="metric-badge best"><span class="metric-val">15.2 s</span> median time @ H=50</span>
-                <span class="metric-badge"><span class="metric-val">4×</span> faster than CEM</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <!-- Replace src with actual result image path, e.g. src="results/pusht_results.png" -->
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">Push-T &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/pusht_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  Push-T success rate (%) and median time-to-success across planning horizons H=40–80.
-                  GRASP achieves the highest success rate at longer horizons while remaining the fastest.
-                </figcaption>
-              </figure>
-            </div>
-
-            <!-- ── Task 2: Ball Navigation ── -->
-            <div id="task-ballnav" class="eval-panel">
-              <div class="eval-task-header">
-                <h3>Ball Navigation</h3>
-                <p>A ball must navigate around obstacles to reach a goal position in a 2D arena.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">87.2 %</span> success rate</span>
-                <span class="metric-badge best"><span class="metric-val">3.1 s</span> median time</span>
-                <span class="metric-badge"><span class="metric-val">2×</span> faster than GD</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">Ball Navigation &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/ballnav_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  Ball Navigation success rate across varying planning horizons. GRASP leverages
-                  lifted-state exploration to navigate around obstacles that trip up serial planners.
-                </figcaption>
-              </figure>
-            </div>
-
-            <!-- ── Task 3: Maze2D ── -->
-            <div id="task-maze2d" class="eval-panel">
-              <div class="eval-task-header">
-                <h3>Maze2D</h3>
-                <p>A point agent must find a path through a 2D maze to a goal, requiring non-greedy long-range planning.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">74.0 %</span> success rate</span>
-                <span class="metric-badge best"><span class="metric-val">11.4 s</span> median time</span>
-                <span class="metric-badge"><span class="metric-val">LatCo 0 %</span> at H=70</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">Maze2D &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/maze2d_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  Maze2D: success rate vs. horizon. All baselines degrade sharply beyond H=60;
-                  GRASP's stop-gradient collocation maintains a viable success rate.
-                </figcaption>
-              </figure>
-            </div>
-
-            <!-- ── Task 4: RoboPush ── -->
-            <div id="task-robopush" class="eval-panel">
-              <div class="eval-task-header">
-                <h3>RoboPush</h3>
-                <p>A robot arm must push an object to a target configuration on a table-top surface.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">61.8 %</span> success rate</span>
-                <span class="metric-badge best"><span class="metric-val">22.7 s</span> median time</span>
-                <span class="metric-badge"><span class="metric-val">+18 pp</span> over GD</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">RoboPush &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/robopush_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  RoboPush results. The stop-gradient gradient-shaping is critical here because the
-                  high-dimensional visual state makes raw state-input gradients unreliable.
-                </figcaption>
-              </figure>
-            </div>
-
-            <!-- ── Task 5: Point Mass ── -->
-            <div id="task-pointmass" class="eval-panel">
-              <div class="eval-task-header">
-                <h3>Point Mass</h3>
-                <p>A canonical continuous-control benchmark: a point mass must reach a goal in a bounded 2D space.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">95.4 %</span> success rate</span>
-                <span class="metric-badge best"><span class="metric-val">1.8 s</span> median time</span>
-                <span class="metric-badge"><span class="metric-val">H=100</span> horizon tested</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">Point Mass &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/pointmass_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  Point Mass results at very long horizons (H up to 100). GRASP's parallel
-                  collocation yields near-constant wall-clock time as horizon increases.
-                </figcaption>
-              </figure>
-            </div>
-
-            <!-- Pagination dots -->
-            <div class="eval-pagination" id="eval-dots">
-              <button class="eval-dot active" onclick="selectTask(0)" title="Push-T"></button>
-              <button class="eval-dot" onclick="selectTask(1)" title="Ball Navigation"></button>
-              <button class="eval-dot" onclick="selectTask(2)" title="Maze2D"></button>
-              <button class="eval-dot" onclick="selectTask(3)" title="RoboPush"></button>
-              <button class="eval-dot" onclick="selectTask(4)" title="Point Mass"></button>
-            </div>
-
-          </div><!-- /.eval-section -->
-
-           <!-- ══════════════════════════════════════════════
-               INTERACTIVE EVAL RESULTS SECTION
-          ══════════════════════════════════════════════ -->
-          <div class="eval-section">
-            <h2 id="eval-results">Evaluation Results</h2>
-
-            <p>
-              Select an evaluation task below to view GRASP's results compared to baseline planners.
-              Each task tests a different aspect of long-horizon planning under a learned world model.
-            </p>
-
-            <!-- Dropdown control -->
-            <div class="eval-controls">
-              <label for="eval-task-select">Eval Task:</label>
-              <select id="eval-task-select" class="eval-dropdown" onchange="showTask(this.value)">
-                <option value="task-pusht">Push-T</option>
-                <option value="task-ballnav">Ball Navigation</option>
-                <option value="task-maze2d">Maze2D</option>
-                <option value="task-robopush">RoboPush</option>
-                <option value="task-pointmass">Point Mass</option>
-              </select>
-            </div>
-
-            <!-- ── Task 1: Push-T ── -->
-            <div id="task-pusht" class="eval-panel active">
-              <div class="eval-task-header">
-                <h3>Push-T</h3>
-                <p>Goal-conditioned planar pushing task. A disc must be pushed to align a T-shaped block with a target pose.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">43.4 %</span> success @ H=50</span>
-                <span class="metric-badge best"><span class="metric-val">15.2 s</span> median time @ H=50</span>
-                <span class="metric-badge"><span class="metric-val">4×</span> faster than CEM</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <!-- Replace src with actual result image path, e.g. src="results/pusht_results.png" -->
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">Push-T &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/pusht_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  Push-T success rate (%) and median time-to-success across planning horizons H=40–80.
-                  GRASP achieves the highest success rate at longer horizons while remaining the fastest.
-                </figcaption>
-              </figure>
-            </div>
-
-            <!-- ── Task 2: Ball Navigation ── -->
-            <div id="task-ballnav" class="eval-panel">
-              <div class="eval-task-header">
-                <h3>Ball Navigation</h3>
-                <p>A ball must navigate around obstacles to reach a goal position in a 2D arena.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">87.2 %</span> success rate</span>
-                <span class="metric-badge best"><span class="metric-val">3.1 s</span> median time</span>
-                <span class="metric-badge"><span class="metric-val">2×</span> faster than GD</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">Ball Navigation &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/ballnav_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  Ball Navigation success rate across varying planning horizons. GRASP leverages
-                  lifted-state exploration to navigate around obstacles that trip up serial planners.
-                </figcaption>
-              </figure>
-            </div>
-
-            <!-- ── Task 3: Maze2D ── -->
-            <div id="task-maze2d" class="eval-panel">
-              <div class="eval-task-header">
-                <h3>Maze2D</h3>
-                <p>A point agent must find a path through a 2D maze to a goal, requiring non-greedy long-range planning.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">74.0 %</span> success rate</span>
-                <span class="metric-badge best"><span class="metric-val">11.4 s</span> median time</span>
-                <span class="metric-badge"><span class="metric-val">LatCo 0 %</span> at H=70</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">Maze2D &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/maze2d_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  Maze2D: success rate vs. horizon. All baselines degrade sharply beyond H=60;
-                  GRASP's stop-gradient collocation maintains a viable success rate.
-                </figcaption>
-              </figure>
-            </div>
-
-            <!-- ── Task 4: RoboPush ── -->
-            <div id="task-robopush" class="eval-panel">
-              <div class="eval-task-header">
-                <h3>RoboPush</h3>
-                <p>A robot arm must push an object to a target configuration on a table-top surface.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">61.8 %</span> success rate</span>
-                <span class="metric-badge best"><span class="metric-val">22.7 s</span> median time</span>
-                <span class="metric-badge"><span class="metric-val">+18 pp</span> over GD</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">RoboPush &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/robopush_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  RoboPush results. The stop-gradient gradient-shaping is critical here because the
-                  high-dimensional visual state makes raw state-input gradients unreliable.
-                </figcaption>
-              </figure>
-            </div>
-
-            <!-- ── Task 5: Point Mass ── -->
-            <div id="task-pointmass" class="eval-panel">
-              <div class="eval-task-header">
-                <h3>Point Mass</h3>
-                <p>A canonical continuous-control benchmark: a point mass must reach a goal in a bounded 2D space.</p>
-              </div>
-
-              <div class="eval-metrics">
-                <span class="metric-badge best"><span class="metric-val">95.4 %</span> success rate</span>
-                <span class="metric-badge best"><span class="metric-val">1.8 s</span> median time</span>
-                <span class="metric-badge"><span class="metric-val">H=100</span> horizon tested</span>
-              </div>
-
-              <figure class="eval-result-figure">
-                <div class="result-img-wrap">
-                  <div class="img-placeholder">
-                    <span class="ph-icon fa fa-bar-chart"></span>
-                    <span class="ph-label">Point Mass &nbsp;·&nbsp; Result Image</span>
-                    <span style="font-size:0.8rem;color:#a0b0cc;">Replace with: results/pointmass_results.png</span>
-                  </div>
-                </div>
-                <figcaption>
-                  Point Mass results at very long horizons (H up to 100). GRASP's parallel
-                  collocation yields near-constant wall-clock time as horizon increases.
-                </figcaption>
-              </figure>
-            </div>
-
-            <!-- Pagination dots -->
-            <div class="eval-pagination" id="eval-dots">
-              <button class="eval-dot active" onclick="selectTask(0)" title="Push-T"></button>
-              <button class="eval-dot" onclick="selectTask(1)" title="Ball Navigation"></button>
-              <button class="eval-dot" onclick="selectTask(2)" title="Maze2D"></button>
-              <button class="eval-dot" onclick="selectTask(3)" title="RoboPush"></button>
-              <button class="eval-dot" onclick="selectTask(4)" title="Point Mass"></button>
+            <div class="eval-pagination" id="plot-dots">
+              <button class="eval-dot active" onclick="selectPlot(0)" title="Full finetuning"></button>
+              <button class="eval-dot" onclick="selectPlot(1)" title="LoRA finetuning"></button>
+              <button class="eval-dot" onclick="selectPlot(2)" title="From Adam pretraining"></button>
+              <button class="eval-dot" onclick="selectPlot(3)" title="From Muon pretraining"></button>
             </div>
 
           </div><!-- /.eval-section -->
@@ -1032,30 +406,55 @@
     <div class="measure"></div>
   </footer>
 
-  <!-- ── Dropdown / dot logic ── -->
+  <!-- ── Interactive plot switching logic ── -->
   <script>
-    const TASKS = [
-      'task-pusht',
-      'task-ballnav',
-      'task-maze2d',
-      'task-robopush',
-      'task-pointmass'
+    const PLOTS = [
+      {
+        key: 'fullft',
+        src: 'per_tensor_scatter_fullft_l_inf_vs_rms.html',
+        title: 'Full finetuning',
+        subtitle: 'Per-tensor weight changes for full finetuning of the base model.'
+      },
+      {
+        key: 'lora',
+        src: 'per_tensor_scatter_lora_l_inf_vs_rms.html',
+        title: 'LoRA finetuning',
+        subtitle: 'Per-tensor weight changes when using LoRA adapters during finetuning.'
+      },
+      {
+        key: 'adam_pre',
+        src: 'per_tensor_scatter_adam_pre_l_inf_vs_rms.html',
+        title: 'Full and LoRA finetuning from Adam pretraining',
+        subtitle: 'Per-tensor weight changes when finetuning (full or LoRA) starting from an Adam-pretrained base model.'
+      },
+      {
+        key: 'muon_pre',
+        src: 'per_tensor_scatter_muon_pre_l_inf_vs_rms.html',
+        title: 'Full and LoRA finetuning from Muon pretraining',
+        subtitle: 'Per-tensor weight changes when finetuning (full or LoRA) starting from a Muon-pretrained base model.'
+      }
     ];
 
-    function showTask(taskId) {
-      TASKS.forEach((id, idx) => {
-        const panel = document.getElementById(id);
-        const dot   = document.querySelectorAll('.eval-dot')[idx];
-        const active = (id === taskId);
-        panel.classList.toggle('active', active);
-        dot.classList.toggle('active', active);
+    function showPlot(key) {
+      const idx = PLOTS.findIndex(p => p.key === key);
+      if (idx === -1) return;
+      const plot  = PLOTS[idx];
+      const frame = document.getElementById('plot-frame');
+      if (frame.getAttribute('data-src') !== plot.src) {
+        frame.setAttribute('data-src', plot.src);
+        frame.src = plot.src;
+      }
+      document.getElementById('plot-title').textContent    = plot.title;
+      document.getElementById('plot-subtitle').textContent = plot.subtitle;
+      document.getElementById('plot-select').value         = key;
+      document.querySelectorAll('#plot-dots .eval-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i === idx);
       });
-      // keep dropdown in sync
-      document.getElementById('eval-task-select').value = taskId;
     }
 
-    function selectTask(idx) {
-      showTask(TASKS[idx]);
+    function selectPlot(idx) {
+      if (idx < 0 || idx >= PLOTS.length) return;
+      showPlot(PLOTS[idx].key);
     }
   </script>
 
