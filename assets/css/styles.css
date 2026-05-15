@@ -228,10 +228,15 @@
   margin-bottom: 0.85em;
 }
 
-/* ─── Interactive plot iframe ─── */
+/* ─── Interactive plot iframe ───
+   Break the plot out of the narrow BAIR `.measure` column so the
+   scatter plots have room to breathe. The wrap is centered against
+   the viewport, capped at 1200px, but never wider than 95vw.       */
 .plot-frame-wrap {
   position: relative;
-  width: 100%;
+  width: min(95vw, 1200px);
+  margin-left: 50%;
+  transform: translateX(-50%);
   border: 1px solid #dde3ef;
   border-radius: 6px;
   overflow: hidden;

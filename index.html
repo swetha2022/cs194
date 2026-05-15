@@ -88,22 +88,22 @@
             <div class="eval-controls">
               <label for="plot-select">Scatter Plot:</label>
               <select id="plot-select" class="eval-dropdown" onchange="showPlot(this.value)">
-                <option value="fullft"
+                <!-- <option value="fullft"
                         data-src="plots/per_tensor_scatter_fullft_l_inf_vs_rms.html"
                         data-title="Full finetuning"
                         data-subtitle="Per-tensor weight changes for full finetuning of the base model.">Full finetuning</option>
                 <option value="lora"
                         data-src="plots/per_tensor_scatter_lora_l_inf_vs_rms.html"
                         data-title="LoRA finetuning"
-                        data-subtitle="Per-tensor weight changes when using LoRA adapters during finetuning.">LoRA finetuning</option>
+                        data-subtitle="Per-tensor weight changes when using LoRA adapters during finetuning.">LoRA finetuning</option> -->
                 <option value="adam_pre"
                         data-src="plots/per_tensor_scatter_adam_pre_l_inf_vs_rms.html"
-                        data-title="Full and LoRA finetuning from Adam pretraining"
-                        data-subtitle="Per-tensor weight changes when finetuning (full or LoRA) starting from an Adam-pretrained base model.">Full and LoRA finetuning from Adam pretraining</option>
+                        data-title="Adam Pretraining"
+                        data-subtitle="Per-tensor weight changes when finetuning (full or LoRA) starting from an Adam-pretrained base model.">Adam Pretraining</option>
                 <option value="muon_pre"
                         data-src="plots/per_tensor_scatter_muon_pre_l_inf_vs_rms.html"
-                        data-title="Full and LoRA finetuning from Muon pretraining"
-                        data-subtitle="Per-tensor weight changes when finetuning (full or LoRA) starting from a Muon-pretrained base model.">Full and LoRA finetuning from Muon pretraining</option>
+                        data-title="Muon Pretraining"
+                        data-subtitle="Per-tensor weight changes when finetuning (full or LoRA) starting from a Muon-pretrained base model.">Muon Pretraining</option>
               </select>
             </div>
 
@@ -118,14 +118,6 @@
                       title="Interactive per-tensor scatter plot"
                       loading="lazy"
                       allow="fullscreen"></iframe>
-            </div>
-
-            <!-- Pagination dots -->
-            <div class="eval-pagination" id="plot-dots">
-              <button class="eval-dot active" onclick="selectPlot(0)" title="Full finetuning"></button>
-              <button class="eval-dot" onclick="selectPlot(1)" title="LoRA finetuning"></button>
-              <button class="eval-dot" onclick="selectPlot(2)" title="From Adam pretraining"></button>
-              <button class="eval-dot" onclick="selectPlot(3)" title="From Muon pretraining"></button>
             </div>
 
           </div><!-- /.eval-section -->
