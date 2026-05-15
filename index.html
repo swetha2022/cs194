@@ -124,6 +124,33 @@
 
           <hr>
 
+          <h2>Methods</h2>
+          <p>
+            We use Moonlight-16B-A3B-Instruct checkpoints from Moonshot pretraining at step 42k: one trained 
+            with AdamW and one with Muon. Architecture and pretraining data are otherwise matched, so 
+            differences in our fine-tuning experiments are attributable to optimizer pairing rather than model 
+            family. Each regime uses a 2&times;2 design (pretraining optimizer &times; fine-tuning optimizer), 
+            trained with NeMo RL on 8&times; H100 GPUs in bfloat16 with activation checkpointing.
+          </p>
+          <p>
+            We evaluate two fine-tuning regimes. The first is <strong><em>in-distribution</em></strong> 
+            fine-tuning on C4 web-text continuation, where the model continues a web-text excerpt and we 
+            report validation cross-entropy on a held-out split. The second is 
+            <strong><em>out-of-distribution</em></strong> fine-tuning on SimLingo autonomous driving language, 
+            where the model predicts templated driving action language from scene descriptions &mdash; a domain 
+            that differs sharply from general web pretraining. For SimLingo, we measure MMLU accuracy before 
+            and after fine-tuning to quantify forgetting. For both regimes, we compare full-parameter updates 
+            against LoRA (rank 16, &alpha;=32) as a forgetting mitigation strategy.
+          </p>
+          <p>
+            To investigate <em>why</em> optimizer mismatch affects forgetting, we also measure the 
+            &ell;<sub>&infin;</sub> and RMS&rarr;RMS induced norms of the weight updates across all SimLingo 
+            fine-tuning runs. Below we present evaluation results and per-tensor weight change diagrams for 
+            the SimLingo experiments.
+          </p>
+
+          <hr>
+
           <!-- ══════════════════════════════════════════════
                INTERACTIVE PER-TENSOR SCATTER PLOTS
           ══════════════════════════════════════════════ -->
