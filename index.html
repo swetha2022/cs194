@@ -69,14 +69,14 @@
             when training a model on a new task causes a rapid deterioration in its performance on 
             previously learned tasks. We analyze how the combination of different optimizers during 
             pre-training and fine-tuning affects catastrophic forgetting. Instantiating from two variants 
-            of Moonlight-16B pre-trained with AdamW and Muon, we investigate how model performance on 
+            of <strong>Moonlight-16B</strong> pre-trained with <strong>AdamW</strong> and <strong>Muon</strong>, we investigate how model performance on 
             pre-training tasks evolves when fine-tuning with a different optimizer compared to pre-training, 
             and when fine-tuning with the same optimizer as used in pre-training. We investigate two 
-            regimes: (i) <em>in-distribution</em> supervised fine-tuning on English web-text continuation, 
+            regimes: (i) <strong><em>in-distribution</em></strong> supervised fine-tuning on English web-text continuation, 
             where the SFT distribution lies inside the pre-training data mix, and 
-            (ii) <em>out-of-distribution</em> fine-tuning on autonomous-driving language-action prediction. 
+            (ii) <strong><em>out-of-distribution</em></strong> fine-tuning on autonomous-driving language-action prediction. 
             Within the autonomous driving domain, optimizer mismatch consistently worsens catastrophic 
-            forgetting on MMLU under full fine-tuning; LoRA mitigates forgetting but shows mixed optimizer 
+            forgetting under full fine-tuning; LoRA mitigates forgetting but shows mixed optimizer 
             effects. On encompassed C4 data, validation-loss differences across optimizer pairings are 
             small (&#8776;&nbsp;2.39&ndash;2.41), suggesting that mismatch may be more harmful when 
             fine-tuning induces a strong domain shift.
