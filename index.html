@@ -46,16 +46,16 @@
 
         <!-- Post header -->
         <div class="post-header mb2">
-          <h1>Gradient-based Planning for World Models at Longer Horizons</h1>
+          <h1>Optimizer Mismatch Drives Catastrophic Forgetting</h1>
           <div class="post-meta">
-            <a href="https://michael-psenka.github.io/">Michael Psenka</a>,
-            <a href="https://ai.meta.com/people/1148536089838617/michael-rabbat/">Mike Rabbat</a>,
-            <a href="https://a1k12.github.io/">Aditi Krishnapriyan</a>,
-            <a href="https://yann.lecun.com/">Yann LeCun</a>,
-            <a href="https://amirbar.net/">Amir Bar</a>
-            &nbsp;&nbsp;Apr 20, 2026
+            Celine Tan,
+            E Harrison,
+            Katie Wang,
+            Swetha Rajkumar,
+            Ryan Cheng,
+            &nbsp;&nbsp;May 15, 2026
           </div>
-        </div>
+          </div>
 
         <article class="post-content">
 
@@ -314,25 +314,37 @@
           <hr>
 
           <!-- Keep rest of post content below -->
-          <h2>What's next?</h2>
+          <h2>Discussion</h2>
           <p>
-            There is still plenty of work to be done for modern world model planners. We want to
-            exploit the gradient structure of learned world models, and collocation (lifted-state
-            optimization) is a natural approach for long-horizon planning, but it's crucial to
-            understand typical gradient structure here: smooth and informative action gradients
-            and brittle state gradients. We view GRASP as an initial iteration for such planners.
+            Our results separate two axes: <em>optimizer mismatch</em> and <em>distribution shift</em>. 
+            On encompassed C4 continuation, validation-loss differences across optimizer pairings are small, 
+            so mismatch alone may be insufficient to induce large measurable shifts when the task stays 
+            in-distribution. On OOD SimLingo driving language, mismatch correlates with worse MMLU retention 
+            under full fine-tuning, and LoRA greatly reduces forgetting.
+          </p>
+          
+          <p>
+            <strong>Limitations.</strong> SimLingo experiments use a single seed in the reported tables; 
+            C4 uses three seeds. Benchmark contamination is possible for MMLU despite OOD fine-tuning data; 
+            we mitigated domain overlap by choosing driving language unlike web pretraining. Hyperparameters 
+            were not exhaustively tuned per optimizer pair. Future work should add optimizer transition 
+            schedules and test additional OOD domains.
           </p>
           <p>
-            Extension to diffusion-based world models, more sophisticated optimizers and noising
-            strategies, and integrating GRASP into either a closed-loop system or RL policy
-            learning for adaptive long-horizon planning are all natural and interesting next steps.
+            For more details, view our code and paper here:
+            <a href="https://github.com/swetha2022/194-final-project">code and paper</a>
           </p>
+
+          <hr>
+          <h2>Acknowledgments</h2>
           <p>
-            For more details, read the
-            <a href="https://arxiv.org/pdf/2602.00475">full paper</a>
-            or visit the
-            <a href="https://www.michaelpsenka.io/grasp/">project website</a>.
+            We thank course staff and our classmates for their feedback. SimLingo training logs are available 
+            at <a href="https://wandb.ai/cs194-squad/moonlight-driving-ft">https://wandb.ai/cs194-squad/moonlight-driving-ft</a>. 
+            C4 training logs are available at 
+            <a href="https://wandb.ai/katiewang-university-of-california-berkeley/sft-dev">https://wandb.ai/katiewang-university-of-california-berkeley/sft-dev</a>. 
+            We also thank NVIDIA for sponsoring our compute, enabling us to be able to carry out these experiments.
           </p>
+
 
         </article><!-- /.post-content -->
 
