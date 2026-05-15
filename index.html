@@ -138,15 +138,15 @@
             report validation cross-entropy on a held-out split. The second is 
             <strong><em>out-of-distribution</em></strong> fine-tuning on SimLingo autonomous driving language, 
             where the model predicts templated driving action language from scene descriptions &mdash; a domain 
-            that differs sharply from general web pretraining. For SimLingo, we measure MMLU accuracy before 
-            and after fine-tuning to quantify forgetting. For both regimes, we compare full-parameter updates 
+            that differs sharply from general web pretraining. For both regimes, we measure accuracy across various metrics in the pretraining distribution before 
+            and after fine-tuning to quantify forgetting and compare full-parameter updates 
             against LoRA (rank 16, &alpha;=32) as a forgetting mitigation strategy.
           </p>
           <p>
             To investigate <em>why</em> optimizer mismatch affects forgetting, we also measure the 
-            &ell;<sub>&infin;</sub> and RMS&rarr;RMS induced norms of the weight updates across all SimLingo 
-            fine-tuning runs. Below we present evaluation results and per-tensor weight change diagrams for 
-            the SimLingo experiments.
+            &ell;<sub>&infin;</sub> and RMS&rarr;RMS induced norms of the weight updates across the 
+            fine-tuning runs for both regimes. Below we present evaluation results and per-tensor weight change diagrams for 
+            the SimLingo experiments, demonstrating the impact optimizer mismatch has on catastropic forgetting and weight updates. The results for C4 can be viewed on our paper.
           </p>
 
           <hr>
@@ -291,8 +291,14 @@
             We thank course staff and our classmates for their feedback. SimLingo training logs are available 
             at <a href="https://wandb.ai/cs194-squad/moonlight-driving-ft" style="word-break:break-all;">https://wandb.ai/cs194-squad/moonlight-driving-ft</a>. 
             C4 training logs are available at 
-            <a href="https://wandb.ai/katiewang-university-of-california-berkeley/sft-dev" style="word-break:break-all;">https://wandb.ai/katiewang-university-of-california-berkeley/sft-dev</a>. 
-            We also thank NVIDIA for sponsoring our compute, enabling us to be able to carry out these experiments.
+            <a href="https://wandb.ai/katiewang-university-of-california-berkeley/sft-dev" style="word-break:break-all;">https://wandb.ai/katiewang-university-of-california-berkeley/sft-dev</a>. We also thank NVIDIA for sponsoring our compute, which was instrumental in enabling this work. 
+            The GPU allocation allowed us to ablate over multiple fine-tuning configurations — including 
+            optimizer combinations, LoRA vs. full fine-tuning, and learning rate schedules — across two 
+            distinct fine-tuning datasets and multiple random seeds. It also made it practical to run 
+            compute-intensive evaluations such as MMLU at scale and complete them in a reasonable timeframe, 
+            as well as to compute and store per-tensor weight change norms across all fine-tuning runs for 
+            our weight change analysis.
+            
           </p>
 
 
