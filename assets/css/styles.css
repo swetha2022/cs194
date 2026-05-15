@@ -228,6 +228,56 @@
   margin-bottom: 0.85em;
 }
 
+/* ─── Plot swap animation ───
+   Apply to any <img> / <iframe> whose src is swapped at runtime.
+   JS toggles `.is-loading` to fade-out before the swap; the load
+   handler removes it to fade back in.                              */
+.plot-fade {
+  transition: opacity 0.28s ease, filter 0.28s ease;
+  opacity: 1;
+}
+
+.plot-fade.is-loading {
+  opacity: 0;
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+/* ─── Side-by-side eval figures (Full FT + LoRA) ───
+   Same width-breakout trick as the scatter-plot iframe so the two
+   figures fit comfortably side-by-side, even though the surrounding
+   text column is narrow.                                            */
+.eval-figures-grid {
+  position: relative;
+  width: min(95vw, 1200px);
+  margin-left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.eval-figures-grid .eval-result-figure {
+  margin: 0;
+}
+
+.eval-figures-grid .result-img-wrap {
+  display: block;
+  width: 100%;
+}
+
+.eval-figures-grid img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (max-width: 800px) {
+  .eval-figures-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ─── Interactive plot iframe ───
    Break the plot out of the narrow BAIR `.measure` column so the
    scatter plots have room to breathe. The wrap is centered against
