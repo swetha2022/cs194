@@ -84,6 +84,46 @@
 
           <hr>
 
+          <h2>Theory: Why Optimizer Choice Affects Forgetting</h2>
+          <p>
+            A key insight from Bernstein et al. is that gradient-based optimizers can be understood as solving 
+            the same constrained optimization problem, just over different norms. Given a parameter update, a 
+            good optimizer minimizes the loss as much as possible within a restricted step size:
+          </p>
+
+          <div style="text-align:center; margin: 1em 0;">
+            &#x1D4DB;(&theta; + &Delta;&theta;) &asymp; &#x1D4DB;(&theta;) + &langle;&nabla;<sub>&theta;</sub>&#x1D4DB;(&theta;), &Delta;&theta;&rangle;
+          </div>
+
+          <p>
+            Solving this with a norm constraint &mdash; keep &Delta;&theta; within some budget &eta; &mdash; 
+            yields different optimizers depending on which norm you choose:
+          </p>
+
+          <div style="text-align:center; margin: 1em 0; line-height: 2.2;">
+            &Delta;&theta;* = arg min<sub>&#x2016;&Delta;&theta;&#x2016; &leq; &eta;</sub> &#x1D4DB;(&theta; + &Delta;&theta;)<br>
+            &Delta;&theta;* = arg min<sub>&#x2016;&Delta;&theta;&#x2016; &leq; &eta;</sub> &#x1D4DB;(&theta;) + &langle;&nabla;<sub>&theta;</sub>&#x1D4DB;(&theta;), &Delta;&theta;&rangle;<br>
+            &Delta;&theta;* = arg min<sub>&#x2016;&Delta;&theta;&#x2016; &leq; &eta;</sub> &langle;&nabla;<sub>&theta;</sub>&#x1D4DB;(&theta;), &Delta;&theta;&rangle;
+          </div>
+
+          <p>
+            The &ell;<sub>2</sub>-norm recovers gradient descent (and SGD with batches); the &ell;<sub>&infin;</sub>-norm 
+            recovers sign-GD, which closely resembles Adam when momentum is added. Muon was derived using the 
+            RMS&rarr;RMS induced norm for matrices.
+          </p>
+          <p>
+            This has a direct consequence for catastrophic forgetting. When a model is pre-trained with one 
+            optimizer, its parameters settle onto a loss surface shaped by that optimizer's norm constraint. 
+            Fine-tuning with a <em>different</em> optimizer imposes a different norm, so updates push parameters 
+            off that surface &mdash; causing a sudden collapse in pre-trained task performance. Recent work has 
+            further argued that Adam's implicit regularization minimizes tr(Diag(<strong><em>H</em></strong><sup>1/2</sup>)), 
+            where <strong><em>H</em></strong> is the Hessian of the model weights, while Muon's geometry differs 
+            fundamentally. Our experiments test whether this mismatch measurably worsens forgetting in practice, 
+            across both in-distribution and OOD fine-tuning settings.
+          </p>
+
+          <hr>
+
           <!-- ══════════════════════════════════════════════
                INTERACTIVE PER-TENSOR SCATTER PLOTS
           ══════════════════════════════════════════════ -->
@@ -352,7 +392,11 @@
           <hr>
           <h2>Acknowledgments</h2>
           <p>
-            We thank course staff and our classmates for their feedback. SimLingo training logs are available at <a href="https://wandb.ai/cs194-squad/moonlight-driving-ft">https://wandb.ai/cs194-squad/moonlight-driving-ft</a>. C4 training logs are available at <a href="https://wandb.ai/katiewang-university-of-california-berkeley/sft-dev">https://wandb.ai/katiewang-university-of-california-berkeley/sft-dev</a>. We also thank NVIDIA for sponsoring our compute, enabling us to be able to carry out these experiments.
+            We thank course staff and our classmates for their feedback. SimLingo training logs are available 
+            at <a href="https://wandb.ai/cs194-squad/moonlight-driving-ft" style="word-break:break-all;">https://wandb.ai/cs194-squad/moonlight-driving-ft</a>. 
+            C4 training logs are available at 
+            <a href="https://wandb.ai/katiewang-university-of-california-berkeley/sft-dev" style="word-break:break-all;">https://wandb.ai/katiewang-university-of-california-berkeley/sft-dev</a>. 
+            We also thank NVIDIA for sponsoring our compute, enabling us to be able to carry out these experiments.
           </p>
 
 
